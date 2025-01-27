@@ -1,4 +1,4 @@
-import bencode/decode
+import bencode/parser
 import glbencode
 import gleam/bit_array
 import gleam/dict
@@ -42,7 +42,7 @@ pub fn parse_test() {
 pub fn binary_parse_test() {
   "10:HelloWorldi123e10:HelloWorldld3:heli132e3:heai132e3:heei132eei132ei123eli132ei123ee10:HelloWorldi123e10:HelloWorlde10:HelloWorldi123e10:HelloWorld"
   |> bit_array.from_string
-  |> decode.parse
+  |> parser.parse
   |> should.be_ok
   |> should.equal([
     StringToken(<<"HelloWorld">>),
