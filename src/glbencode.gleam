@@ -3,7 +3,9 @@ import bencode/encode
 import bencode/intermediate.{DictionaryToken}
 import bencode/parser
 import gleam/bit_array
+import gleam/dict
 import gleam/dynamic/decode as dyn_decoder
+import gleam/io
 import gleam/list
 import gleam/result
 import simplifile
@@ -15,11 +17,12 @@ pub fn main() {
 
   let assert Ok(intermediate.DictionaryToken(x)) = res |> list.first
 
-  encode.new()
-  |> encode.dictionary(fn(_) { x })
-  |> encode.encode
-  |> result.unwrap(<<>>)
-  |> simplifile.write_bits("./testint.torrent", _)
+  io.debug(dict.keys(x))
+  // encode.new()
+  // |> encode.dictionary(fn(_) { x })
+  // |> encode.encode
+  // |> result.unwrap(<<>>)
+  // |> simplifile.write_bits("./testint.torrent", _)
 }
 
 pub fn parse(in: String) {
