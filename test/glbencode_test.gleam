@@ -12,13 +12,10 @@ pub fn main() {
 }
 
 pub fn parse_test() {
-  "10:HelloWorldi123e10:HelloWorldld3:heli132e3:heai132e3:heei132eei132ei123eli132ei123ee10:HelloWorldi123e10:HelloWorlde10:HelloWorldi123e10:HelloWorld"
+  "ld3:heli132e3:heai132e3:heei132eei132ei123eli132ei123ee10:HelloWorldi123e10:HelloWorlde"
   |> glbencode.parse
   |> should.be_ok
-  |> should.equal([
-    StringToken(<<"HelloWorld">>),
-    IntToken(123),
-    StringToken(<<"HelloWorld">>),
+  |> should.equal(
     ListToken([
       DictionaryToken(
         dict.new()
@@ -33,21 +30,15 @@ pub fn parse_test() {
       IntToken(123),
       StringToken(<<"HelloWorld">>),
     ]),
-    StringToken(<<"HelloWorld">>),
-    IntToken(123),
-    StringToken(<<"HelloWorld">>),
-  ])
+  )
 }
 
 pub fn binary_parse_test() {
-  "10:HelloWorldi123e10:HelloWorldld3:heli132e3:heai132e3:heei132eei132ei123eli132ei123ee10:HelloWorldi123e10:HelloWorlde10:HelloWorldi123e10:HelloWorld"
+  "ld3:heli132e3:heai132e3:heei132eei132ei123eli132ei123ee10:HelloWorldi123e10:HelloWorlde"
   |> bit_array.from_string
   |> parser.parse
   |> should.be_ok
-  |> should.equal([
-    StringToken(<<"HelloWorld">>),
-    IntToken(123),
-    StringToken(<<"HelloWorld">>),
+  |> should.equal(
     ListToken([
       DictionaryToken(
         dict.new()
@@ -62,8 +53,5 @@ pub fn binary_parse_test() {
       IntToken(123),
       StringToken(<<"HelloWorld">>),
     ]),
-    StringToken(<<"HelloWorld">>),
-    IntToken(123),
-    StringToken(<<"HelloWorld">>),
-  ])
+  )
 }

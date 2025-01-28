@@ -1,13 +1,10 @@
 import bencode/decode
-import bencode/encode
 import bencode/intermediate.{DictionaryToken}
 import bencode/parser
 import gleam/bit_array
 import gleam/dict
 import gleam/dynamic/decode as dyn_decoder
 import gleam/io
-import gleam/list
-import gleam/result
 import simplifile
 
 pub fn main() {
@@ -15,7 +12,7 @@ pub fn main() {
 
   let assert Ok(res) = parser.parse(t)
 
-  let assert Ok(intermediate.DictionaryToken(x)) = res |> list.first
+  let assert intermediate.DictionaryToken(x) = res
 
   io.debug(dict.keys(x))
   // encode.new()
@@ -25,15 +22,21 @@ pub fn main() {
   // |> simplifile.write_bits("./testint.torrent", _)
 }
 
-pub fn parse(in: String) {
+type DecodeError =
+  parser.DecoderError
+
+type BencodeValue =
+  intermediate.TokenAST
+
+pub fn parse(in: String) -> Result(BencodeValue, DecodeError) {
   parser.parse(bit_array.from_string(in))
 }
 
-pub fn parse_byte(in: BitArray) {
+pub fn parse_byte(in: BitArray) -> Result(BencodeValue, DecodeError) {
   parser.parse(in)
 }
 
-pub fn decode(in: decode.Root, decoder: dyn_decoder.Decoder(a)) {
+pub fn decode(in: BencodeValue, decoder: dyn_decoder.Decoder(a)) {
   in
   |> decode.to_dynamic
   |> dyn_decoder.run(decoder)
