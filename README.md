@@ -1,169 +1,94 @@
+
 # GLBEncode
 
-## Overview
+GLBEncode is a Gleam library for encoding and decoding Bencode data. Bencode is a simple encoding format used by the BitTorrent protocol for storing and transmitting loosely structured data.
 
-GLBEncode is a Gleam-based library for encoding and decoding messages using the Bencode format. This library provides functionality to parse, encode, and decode Bencoded data, which is commonly used in torrent files.
+## Features
 
-## Prerequisites
+- **Parsing**: Convert Bencode data into an intermediate representation.
+- **Encoding**: Convert the intermediate representation back into Bencode format.
+- **Decoding**: Convert the intermediate representation into dynamic Gleam types for further processing.
 
-Before running the code, ensure you have the following installed:
+## Installation
 
-- [Gleam](https://gleam.run/getting-started/) (version 0.17.0 or later)
-- Any necessary libraries or dependencies (listed in `gleam.toml` if applicable)
+To use GLBEncode in your Gleam project, add it to your `gleam.toml` dependencies:
 
-## How to Run the Code
+```toml
+[dependencies]
+glbencode = { path = "./path/to/glbencode" }
+```
 
-1. **Clone the Repository**
+## Usage
 
-   ```bash
-   git clone https://github.com/yourusername/glbencode.git
-   cd glbencode
-   ```
+### Parsing Bencode Data
 
-2. **Build the Project**
-
-   Compile the Gleam project:
-
-   ```bash
-   gleam build
-   ```
-
-3. **Run the Code**
-
-   To run the main function, use the following command:
-
-   ```bash
-   gleam run
-   ```
-
-   This will execute the `main` function in `glbencode/src/glbencode.gleam`.
-
-## How to Run the Tests
-
-1. **Navigate to the Project Directory**
-
-   ```bash
-   cd glbencode
-   ```
-
-2. **Run the Tests**
-
-   You can run the tests using Gleam's built-in test runner:
-
-   ```bash
-   gleam test
-   ```
-
-## How to Encode and Decode a Message
-
-### Encoding a Message
-
-To encode a message, use the `encode` module provided in the code. For example:
+You can parse Bencode data from a string or a byte array:
 
 ```gleam
-import bencode/encode
+import glbencode
+import gleam/result.{Ok, Error}
 
-fn encode_message() {
-  let encoder = encode.new()
-  let encoder = encode.string(encoder, "Hello, World!")
-  let result = encode.encode(encoder)
-  case result {
-    Ok(encoded_message) -> io.debug(encoded_message)
-    Error(error) -> io.debug(error)
-  }
+let bencode_string = "d3:cow3:moo4:spam4:eggse"
+let parsed = glbencode.parse(bencode_string)
+
+case parsed {
+  Ok(value) -> // Handle the parsed value
+  Error(error) -> // Handle the error
 }
 ```
 
-### Decoding a Message
+### Encoding Bencode Data
 
-To decode a message, use the `decode` module provided in the code. For example:
+You can encode data into Bencode format:
 
 ```gleam
-import bencode/decode
-import bencode/parser
-import gleam/bit_array
-import gleam/dynamic/decode as dyn_decoder
+import glbencode/encode
 
-fn decode_message() {
-  let encoded_message = bit_array.from_string("12:Hello, World!")
-  let parsed = parser.parse(encoded_message)
-  case parsed {
-    Ok(tokens) -> {
-      let first_token = list.head(tokens)
-      case first_token {
-        Some(token) -> {
-          let decoder = dyn_decoder.string()
-          let result = decode.decode(token, decoder)
-          case result {
-            Ok(decoded_message) -> io.debug(decoded_message)
-            Error(errors) -> io.debug(errors)
-          }
-        }
-        None -> io.debug("No tokens found")
-      }
-    }
-    Error(error) -> io.debug(error)
-  }
+let encoder = encode.new()
+let encoder = encode.dictionary(encoder, fn(_) {
+  dict.from_list([#("cow", encode.string_value("moo")), #("spam", encode.string_value("eggs"))])
+})
+let encoded = encode.encode(encoder)
+
+case encoded {
+  Ok(bytes) -> // Handle the encoded bytes
+  Error(error) -> // Handle the error
 }
 ```
 
-## Example Usage
+### Decoding Bencode Data
 
-Here is a complete example of encoding and decoding a message:
+You can decode Bencode data into dynamic Gleam types:
 
 ```gleam
-import gleam/io
-import bencode/encode
-import bencode/decode
-import bencode/parser
-import gleam/bit_array
+import glbencode
 import gleam/dynamic/decode as dyn_decoder
 
-fn main() {
-  // Original message
-  let message = "Hello, World!"
+let bencode_string = "d3:cow3:moo4:spam4:eggse"
+let parsed = glbencode.parse(bencode_string)
 
-  // Encode the message
-  let encoder = encode.new()
-  let encoder = encode.string(encoder, message)
-  let encoded_result = encode.encode(encoder)
-  case encoded_result {
-    Ok(encoded_message) -> {
-      io.debug(encoded_message)
-
-      // Decode the message
-      let parsed = parser.parse(encoded_message)
-      case parsed {
-        Ok(tokens) -> {
-          let first_token = list.head(tokens)
-          case first_token {
-            Some(token) -> {
-              let decoder = dyn_decoder.string()
-              let decoded_result = decode.decode(token, decoder)
-              case decoded_result {
-                Ok(decoded_message) -> io.debug(decoded_message)
-                Error(errors) -> io.debug(errors)
-              }
-            }
-            None -> io.debug("No tokens found")
-          }
-        }
-        Error(error) -> io.debug(error)
-      }
-    }
-    Error(error) -> io.debug(error)
+case parsed {
+  Ok(value) -> {
+    let decoder = dyn_decoder.string()
+    let decoded = glbencode.decode(value, decoder)
+    // Handle the decoded value
   }
+  Error(error) -> // Handle the error
 }
+```
+
+## Running the Example
+
+An example is provided in `glbencode/src/glbencode.gleam`. To run it, make sure you have a file named `file.torrent` in the same directory and execute the following command:
+
+```sh
+gleam run
 ```
 
 ## Contributing
 
-If you would like to contribute to this project, please fork the repository and submit a pull request. We welcome all contributions!
+Contributions are welcome! Please open an issue or submit a pull request on GitHub.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
-
----
-
-Thank you for using GLBEncode!
+This project is licensed under the MIT License.
