@@ -7,7 +7,7 @@ import gleam/result
 import gleam/string
 
 import bencode/intermediate.{
-  type TokenAST, DictionaryToken, IntToken, ListToken, NilToken, StringToken,
+  type TokenAST, DictionaryToken, IntToken, ListToken, StringToken,
 }
 
 type BinaryData {
@@ -227,12 +227,10 @@ pub fn parse(in: BitArray) -> Result(TokenAST, DecoderError) {
 
 fn parse_loop(in: BitArray, carry: List(TokenAST)) {
   use <- bool.guard(bit_array.byte_size(in) == 0, Ok(carry))
-  let res = lookahead(in, type_parser)
-  use <- bool.guard(
-    result.is_error(res),
-    Error(res |> result.unwrap_error(ParseError("Unknown error"))),
-  )
 
-  let #(rest, token) = res |> result.unwrap(#(<<>>, NilToken))
-  parse_loop(rest, list.append(carry, [token]))
+  lookahead(in, type_parser)
+  |> result.then(fn(x) {
+    let #(rest, token) = x
+    parse_loop(rest, list.append(carry, [token]))
+  })
 }

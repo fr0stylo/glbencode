@@ -3,9 +3,13 @@ import gleam/bit_array
 import gleam/bool
 import gleam/dict
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/result
+
+pub type EncoderError {
+  UnexpectedInput
+  UnexpectedRootElements
+}
 
 type Encoder =
   List(intermediate.TokenAST)
@@ -73,37 +77,39 @@ fn encode_string(x: BitArray) -> BitArray {
   <<int.to_string(size):utf8, ":", str:utf8>>
 }
 
-fn encode_type(carry: BitArray, in: intermediate.TokenAST) -> BitArray {
+fn encode_type(
+  carry: BitArray,
+  in: intermediate.TokenAST,
+) -> Result(BitArray, EncoderError) {
   case in {
-    IntToken(x) -> bit_array.append(carry, <<"i", int.to_string(x):utf8, "e">>)
+    IntToken(x) ->
+      bit_array.append(carry, <<"i", int.to_string(x):utf8, "e">>) |> Ok
     DictionaryToken(tokens_dict) -> {
       bit_array.append(carry, <<"d">>)
       |> dict.fold(tokens_dict, _, fn(accumulator, key, value) {
         bit_array.append(accumulator, encode_string(<<key:utf8>>))
-        |> bit_array.append(encode_type(<<>>, value))
+        |> bit_array.append(encode_type(<<>>, value) |> result.unwrap(<<>>))
       })
       |> bit_array.append(<<"e">>)
+      |> Ok
     }
     ListToken(tokens) -> {
       list.map(tokens, fn(t) { encode_type(<<>>, t) })
-      |> bit_array.concat
-      |> bit_array.append(<<"l">>, _)
-      |> bit_array.append(<<"e">>)
-      |> bit_array.append(carry, _)
+      |> result.all
+      |> result.then(fn(x) {
+        bit_array.concat(x)
+        |> bit_array.append(<<"l">>, _)
+        |> bit_array.append(<<"e">>)
+        |> bit_array.append(carry, _)
+        |> Ok
+      })
     }
-    StringToken(x) -> encode_string(x)
-    _ -> {
-      io.debug("Unreachable")
-      <<>>
-    }
+    StringToken(x) -> Ok(encode_string(x))
   }
 }
 
-pub fn encode(in: Encoder) -> Result(BitArray, String) {
-  use <- bool.guard(
-    list.length(in) > 1,
-    Error("Bencode must have only one root element"),
-  )
+pub fn encode(in: Encoder) -> Result(BitArray, EncoderError) {
+  use <- bool.guard(list.length(in) > 1, Error(UnexpectedRootElements))
 
-  Ok(list.map(in, fn(x) { encode_type(<<>>, x) }) |> bit_array.concat)
+  list.try_fold(in, <<>>, encode_type)
 }

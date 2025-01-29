@@ -5,5 +5,4 @@ pub type TokenAST {
   StringToken(BitArray)
   DictionaryToken(Dict(String, TokenAST))
   ListToken(List(TokenAST))
-  NilToken
 }

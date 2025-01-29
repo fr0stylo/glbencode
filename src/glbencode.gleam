@@ -1,4 +1,5 @@
 import bencode/decode
+import bencode/encode as encoder
 import bencode/intermediate.{DictionaryToken}
 import bencode/parser
 import gleam/bit_array
@@ -25,6 +26,9 @@ pub fn main() {
 type DecodeError =
   parser.DecoderError
 
+type EncoderError =
+  encoder.EncoderError
+
 type BencodeValue =
   intermediate.TokenAST
 
@@ -37,7 +41,10 @@ pub fn parse_byte(in: BitArray) -> Result(BencodeValue, DecodeError) {
 }
 
 pub fn decode(in: BencodeValue, decoder: dyn_decoder.Decoder(a)) {
-  in
-  |> decode.to_dynamic
+  decode.to_dynamic(in)
   |> dyn_decoder.run(decoder)
+}
+
+pub fn encode(in: BencodeValue) -> Result(BitArray, EncoderError) {
+  encoder.encode([in])
 }

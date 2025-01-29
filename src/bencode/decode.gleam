@@ -21,7 +21,6 @@ pub fn to_dynamic(in: Root) -> dynamic.Dynamic {
 
       bit_array.to_string(x) |> result.unwrap("") |> dynamic.from
     }
-    intermediate.NilToken -> todo
   }
 }
 

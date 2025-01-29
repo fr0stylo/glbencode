@@ -55,3 +55,26 @@ pub fn binary_parse_test() {
     ]),
   )
 }
+
+pub fn encode_test() {
+  glbencode.encode(
+    ListToken([
+      DictionaryToken(
+        dict.new()
+        |> dict.insert("hel", IntToken(132))
+        |> dict.insert("hea", IntToken(132))
+        |> dict.insert("hee", IntToken(132)),
+      ),
+      IntToken(132),
+      IntToken(123),
+      ListToken([IntToken(132), IntToken(123)]),
+      StringToken(<<"HelloWorld">>),
+      IntToken(123),
+      StringToken(<<"HelloWorld">>),
+    ]),
+  )
+  |> should.be_ok
+  |> should.equal(<<
+    "ld3:heai132e3:heei132e3:heli132eei132ei123eli132ei123ee10:HelloWorldi123e10:HelloWorlde",
+  >>)
+}
