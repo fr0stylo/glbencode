@@ -15,7 +15,7 @@ To use GLBEncode in your Gleam project, add it to your `gleam.toml` dependencies
 
 ```toml
 [dependencies]
-glbencode = { path = "./path/to/glbencode" }
+glbencode = "1.0.0"
 ```
 
 ## Usage
@@ -77,13 +77,6 @@ case parsed {
 }
 ```
 
-## Running the Example
-
-An example is provided in `glbencode/src/glbencode.gleam`. To run it, make sure you have a file named `file.torrent` in the same directory and execute the following command:
-
-```sh
-gleam run
-```
 
 ## Contributing
 
