@@ -1,27 +1,9 @@
 import bencode/decode
 import bencode/encode as encoder
-import bencode/intermediate.{DictionaryToken}
+import bencode/intermediate
 import bencode/parser
 import gleam/bit_array
-import gleam/dict
 import gleam/dynamic/decode as dyn_decoder
-import gleam/io
-import simplifile
-
-pub fn main() {
-  let assert Ok(t) = simplifile.read_bits("./file.torrent")
-
-  let assert Ok(res) = parser.parse(t)
-
-  let assert intermediate.DictionaryToken(x) = res
-
-  io.debug(dict.keys(x))
-  // encode.new()
-  // |> encode.dictionary(fn(_) { x })
-  // |> encode.encode
-  // |> result.unwrap(<<>>)
-  // |> simplifile.write_bits("./testint.torrent", _)
-}
 
 type DecodeError =
   parser.DecoderError
