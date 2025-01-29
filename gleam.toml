@@ -3,6 +3,8 @@ version = "1.0.0"
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "fr0stylo", repo = "glbencode" }
 
+description = "Gleam-based implementation for handling Bencode data, a format used by the BitTorrent protocol. It includes modules for parsing raw Bencode data into an intermediate representation, encoding various data types into Bencode format, and decoding Bencode data into dynamic types. This repository is ideal for developers needing to work with Bencode data in Gleam, offering comprehensive tools for parsing, encoding, and decoding."
+
 [dependencies]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
 
